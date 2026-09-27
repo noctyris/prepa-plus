@@ -1,5 +1,7 @@
+use webpki_roots::TLS_SERVER_ROOTS;
 use anyhow::{Context, Result};
 use scraper::{Html, Selector};
+use rustls::RootCertStore;
 use dioxus::prelude::*;
 use serde::Serialize;
 
@@ -179,8 +181,16 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
 }
 
 async fn get_notes(username: &str, password: &str) -> Result<Vec<Semaine>> {
+    let mut roots = RootCertStore::empty();
+    roots.extend(TLS_SERVER_ROOTS.iter().cloned());
+
+    let tls = rustls::ClientConfig::builder()
+        .with_root_certificates(roots)
+        .with_no_client_auth();
+
     let client = reqwest::Client::builder()
         .cookie_store(true)
+        .tls_backend_preconfigured(tls)
         .build()?;
 
     let page = client.get(LOGIN_URL).send().await?.text().await?;

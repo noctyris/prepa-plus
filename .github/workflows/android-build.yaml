@@ -31,13 +31,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Accept licenses & install NDK
         run: |
           yes | sdkmanager --licenses > /dev/null
-          sdkmanager "ndk;27.0.12077973"
+          sdkmanager "ndk;27.0.12077973" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Install Dioxus CLI
         run: cargo install dioxus-cli --locked

@@ -43,7 +43,10 @@ fn app() -> Element {
 
     rsx! {
         div { class: "container",
-            h1 { "Prépa+" }
+            img { src: asset!("assets/icon.png"), class: "logo" }
+            h1 { 
+                "Prépa+"
+            }
             input {
                 value: "{username}",
                 oninput: move |e| username.set(e.value()),

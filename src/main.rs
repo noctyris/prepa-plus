@@ -74,7 +74,7 @@ fn parse_detail(d: &str) -> (String, Rang, Option<f32>, Option<f32>) {
 fn get_notes() -> Result<Vec<Semaine>> {
     dotenv().ok();
 
-    let username = "HJAMIER";
+    let username = env::var("USERNAME").context("Définis USERNAME=...")?;
     let password = env::var("PREPA_PW").context("Définis PREPA_PW=...")?;
 
     let client = Client::builder()

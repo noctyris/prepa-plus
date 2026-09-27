@@ -42,9 +42,9 @@ jobs:
       - name: Build APK
         run: dx build --platform android --release --target aarch64-linux-android
         env:
-          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077 `${{ env.ANDROID_HOME }}/ndk/27.0.12077973`
+          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
           ANDROID_HOME: /usr/local/lib/android/sdk
-          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
+          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+    branches: [prod, main]
+  pull_request:
+
+jobs:
+  check:
+    if: github.ref_name != 'prod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Linux deps
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
+      - run: cargo check
+
+  build-apk:
+    if: github.ref_name == 'prod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Dioxus CLI
+        run: cargo install dioxus-cli --locked
+
+      - name: Build APK
+        run: dx build --platform android --release --target aarch64-linux-android
+        env:
+          NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: prepa-plus-apk
+          path: |
+            target/dx/**/apk/**/*.apk

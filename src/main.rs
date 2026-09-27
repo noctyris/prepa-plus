@@ -1,26 +1,38 @@
 use anyhow::{Context, Result};
 use reqwest::blocking::Client;
 use scraper::{Html, Selector};
+use serde::Serialize;
 use dotenv::dotenv;
-use std::env;
+use std::{env};
 
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
 const LOGIN_URL: &str = "https://cpgedupuydelome.prepas-plus.fr/account/login/";
 
-fn main() -> Result<()> {
+#[derive(Debug, Serialize, Clone)]
+struct Note {
+    semaine:    String,
+    matiere:    String,
+    note:       Option<f32>,
+    detail:     String
+}
+
+fn get_notes() -> Result<Vec<Note>> {
+    // Read dotfile
     dotenv().ok();
+
+    // Get username and password
     let username = "HJAMIER";
-    // Temporaire : mot de passe via variable d'environnement
     let password = env::var("PREPA_PW").context("Définis PREPA_PW=...")?;
 
-    // reqwest::blocking est plus simple pour un CLI
+    // Build web session to stay connected
     let client = Client::builder()
-        .cookie_store(true)  // équivalent de requests.Session()
+        .cookie_store(true)
         .build()?;
 
-    // 1. GET login page
+    // GET login page
     let page = client.get(LOGIN_URL).send()?.text()?;
-    // 2. Extraire le CSRF
+
+    // Extract CSRF
     let re = regex::Regex::new(r#"name="csrfmiddlewaretoken" value="([^"]+)""#)?;
     let csrf = re
         .captures(&page)
@@ -29,7 +41,7 @@ fn main() -> Result<()> {
         .map(|m| m.as_str().to_string())
         .context("Token CSRF introuvable")?;
 
-    // 3. POST login
+    // POST login
     let params = [
         ("csrfmiddlewaretoken", csrf.as_str()),
         ("login_view-current_step", "auth"),
@@ -46,23 +58,23 @@ fn main() -> Result<()> {
         anyhow::bail!("Échec de connexion");
     }
 
-    // 4. GET mes_notes + parser
+    // GET mes_notes + parse
     let notes_page = client
         .get(format!("{BASE}/colles/mes_notes"))
         .send()?
         .text()?;
-    parse_notes(&notes_page);
-    Ok(())
+    parse_notes(&notes_page)
 }
 
-fn parse_notes(html: &str) {
+fn parse_notes(html: &str) -> Result<Vec<Note>> {
     let doc = Html::parse_document(html);
-    // table dont le premier th == "Semaine"
     let table_sel = Selector::parse("table").unwrap();
     let th_sel = Selector::parse("th").unwrap();
     let row_sel = Selector::parse("tr").unwrap();
     let cell_sel = Selector::parse("th, td").unwrap();
     let span_sel = Selector::parse("span").unwrap();
+
+    let mut notes = Vec::new();
 
     for table in doc.select(&table_sel) {
         let first_th = table.select(&th_sel).next();
@@ -79,13 +91,19 @@ fn parse_notes(html: &str) {
             let cells: Vec<_> = row.select(&cell_sel).collect();
             if cells.is_empty() { continue; }
             let semaine = cells[0].text().collect::<String>().trim().to_string();
-            println!("=== {semaine} ===");
             for (matiere, cell) in headers[1..].iter().zip(cells[1..].iter()) {
                 let Some(span) = cell.select(&span_sel).next() else { continue };
-                let note = span.text().collect::<String>().trim().to_string();
-                let details = span.value().attr("title").unwrap_or("");
-                println!("  {matiere}: {note} ({details})");
+                let note = span.text().collect::<String>().trim().to_string().parse::<f32>().ok();
+                let detail = span.value().attr("title").unwrap_or("").to_string();
+                notes.push(Note { semaine: semaine.clone(), matiere: matiere.clone(), note, detail });
             }
         }
     }
+    Ok(notes)
+}
+
+fn main() -> Result<()> {
+    let notes = get_notes()?;
+    println!("{}", serde_json::to_string_pretty(&notes)?);
+    Ok(())
 }

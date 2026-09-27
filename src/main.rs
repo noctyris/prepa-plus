@@ -32,12 +32,10 @@ struct Rang {
     total: Option<u16>,
 }
 
-/// "13,27" -> 13.27 (virgule décimale française)
 fn parse_fr(s: &str) -> Option<f32> {
     s.trim().replace(',', ".").parse().ok()
 }
 
-/// "S1: 14/09-18/09" -> (1, "14/09", "18/09")
 fn parse_semaine(s: &str) -> (Option<u8>, String, String) {
     let (tag, dates) = match s.split_once(':') {
         Some((t, d)) => (t.trim().trim_start_matches('S').to_string(), d.trim()),
@@ -50,7 +48,6 @@ fn parse_semaine(s: &str) -> (Option<u8>, String, String) {
     (tag.parse::<u8>().ok(), debut, fin)
 }
 
-/// "Philippe Eric; Rg:13/46; Moy:13,27; ET:1,94" -> (prof, rang, moyenne, écart-type)
 fn parse_detail(d: &str) -> (String, Rang, Option<f32>, Option<f32>) {
     let mut prof = String::new();
     let mut rang = Rang { rang: None, total: None };
@@ -75,22 +72,17 @@ fn parse_detail(d: &str) -> (String, Rang, Option<f32>, Option<f32>) {
 }
 
 fn get_notes() -> Result<Vec<Semaine>> {
-    // Read dotfile
     dotenv().ok();
 
-    // Get username and password
     let username = "HJAMIER";
     let password = env::var("PREPA_PW").context("Définis PREPA_PW=...")?;
 
-    // Build web session to stay connected
     let client = Client::builder()
         .cookie_store(true)
         .build()?;
 
-    // GET login page
     let page = client.get(LOGIN_URL).send()?.text()?;
 
-    // Extract CSRF
     let re = regex::Regex::new(r#"name="csrfmiddlewaretoken" value="([^"]+)""#)?;
     let csrf = re
         .captures(&page)
@@ -99,7 +91,6 @@ fn get_notes() -> Result<Vec<Semaine>> {
         .map(|m| m.as_str().to_string())
         .context("Token CSRF introuvable")?;
 
-    // POST login
     let params = [
         ("csrfmiddlewaretoken", csrf.as_str()),
         ("login_view-current_step", "auth"),
@@ -116,7 +107,6 @@ fn get_notes() -> Result<Vec<Semaine>> {
         anyhow::bail!("Échec de connexion");
     }
 
-    // GET mes_notes + parse
     let notes_page = client
         .get(format!("{BASE}/colles/mes_notes"))
         .send()?

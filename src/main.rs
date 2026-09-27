@@ -1,9 +1,7 @@
 use anyhow::{Context, Result};
-use reqwest::blocking::Client;
 use scraper::{Html, Selector};
+use dioxus::prelude::*;
 use serde::Serialize;
-use dotenv::dotenv;
-use std::env;
 
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
 const LOGIN_URL: &str = "https://cpgedupuydelome.prepas-plus.fr/account/login/";
@@ -30,6 +28,64 @@ struct Note {
 struct Rang {
     rang:  Option<u16>,
     total: Option<u16>,
+}
+
+fn main() {
+    launch(app);
+}
+
+fn app() -> Element {
+    let mut username = use_signal(|| "HJAMIER".to_string());
+    let mut password = use_signal(String::new);
+    let mut semaines = use_signal(|| None::<Vec<Semaine>>);
+    let mut error = use_signal(|| None::<String>);
+    let mut loading = use_signal(|| false);
+
+    rsx! {
+        div { class: "container",
+            h1 { "Prépa+" }
+            input {
+                value: "{username}",
+                oninput: move |e| username.set(e.value()),
+                placeholder: "Identifiant",
+            }
+            input {
+                r#type: "password",
+                value: "{password}",
+                oninput: move |e| password.set(e.value()),
+                placeholder: "Mot de passe",
+            }
+            button {
+                disabled: loading(),
+                onclick: move |_| async move {
+                    loading.set(true);
+                    error.set(None);
+                    match get_notes(&username.read(), &password.read()).await {
+                        Ok(s) => semaines.set(Some(s)),
+                        Err(e) => error.set(Some(e.to_string())),
+                    }
+                    loading.set(false);
+                },
+                if loading() { "Chargement..." } else { "Voir mes notes" }
+            }
+            if let Some(err) = error() {
+                p { class: "error", "{err}" }
+            }
+            if let Some(semaines) = semaines() {
+                for sem in semaines {
+                    div { class: "card",
+                        h3 { "Semaine {sem.numero:?} — {sem.debut} → {sem.fin}" }
+                        for n in &sem.notes {
+                            div { class: "row",
+                                span { class: "matiere", "{n.matiere}" }
+                                span { class: "note", "{n.note:?}" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 fn parse_fr(s: &str) -> Option<f32> {
@@ -69,49 +125,6 @@ fn parse_detail(d: &str) -> (String, Rang, Option<f32>, Option<f32>) {
         }
     }
     (prof, rang, moyenne, et)
-}
-
-fn get_notes() -> Result<Vec<Semaine>> {
-    dotenv().ok();
-
-    let username = env::var("USERNAME").context("Définis USERNAME=...")?;
-    let password = env::var("PREPA_PW").context("Définis PREPA_PW=...")?;
-
-    let client = Client::builder()
-        .cookie_store(true)
-        .build()?;
-
-    let page = client.get(LOGIN_URL).send()?.text()?;
-
-    let re = regex::Regex::new(r#"name="csrfmiddlewaretoken" value="([^"]+)""#)?;
-    let csrf = re
-        .captures(&page)
-        .context("Token CSRF introuvable")?
-        .get(1)
-        .map(|m| m.as_str().to_string())
-        .context("Token CSRF introuvable")?;
-
-    let params = [
-        ("csrfmiddlewaretoken", csrf.as_str()),
-        ("login_view-current_step", "auth"),
-        ("auth-username", username),
-        ("auth-password", password.as_str()),
-    ];
-    let r = client
-        .post(LOGIN_URL)
-        .header("Referer", LOGIN_URL)
-        .form(&params)
-        .send()?;
-    if r.url().as_str().contains("account/login") {
-        println!("{}", r.status());
-        anyhow::bail!("Échec de connexion");
-    }
-
-    let notes_page = client
-        .get(format!("{BASE}/colles/mes_notes"))
-        .send()?
-        .text()?;
-    parse_notes(&notes_page)
 }
 
 fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
@@ -162,8 +175,43 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
     Ok(semaines)
 }
 
-fn main() -> Result<()> {
-    let semaines = get_notes()?;
-    println!("{}", serde_json::to_string_pretty(&semaines)?);
-    Ok(())
+async fn get_notes(username: &str, password: &str) -> Result<Vec<Semaine>> {
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()?;
+
+    let page = client.get(LOGIN_URL).send().await?.text().await?;
+
+    let re = regex::Regex::new(r#"name="csrfmiddlewaretoken" value="([^"]+)""#)?;
+    let csrf = re
+        .captures(&page)
+        .context("Token CSRF introuvable")?
+        .get(1)
+        .context("Token CSRF introuvable")?
+        .as_str()
+        .to_string();
+
+    let params = [
+        ("csrfmiddlewaretoken", csrf.as_str()),
+        ("login_view-current_step", "auth"),
+        ("auth-username", username),
+        ("auth-password", password),
+    ];
+    let r = client
+        .post(LOGIN_URL)
+        .header("Referer", LOGIN_URL)
+        .form(&params)
+        .send()
+        .await?;
+    if r.url().as_str().contains("account/login") {
+        anyhow::bail!("Échec de connexion");
+    }
+
+    let notes_page = client
+        .get(format!("{BASE}/colles/mes_notes"))
+        .send()
+        .await?
+        .text()
+        .await?;
+    parse_notes(&notes_page)
 }

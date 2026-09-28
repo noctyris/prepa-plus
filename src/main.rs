@@ -126,12 +126,6 @@ fn app() -> Element {
     }
 }
 
-<<<<<<< HEAD
-fn cookies_path() -> PathBuf {
-    dirs::data_local_dir()
-        .unwrap_or_else(std::env::temp_dir)
-        .join("cookies.json")
-=======
 #[cfg(target_os = "android")]
 fn cookies_path() -> std::path::PathBuf {
     use jni::objects::JObject;
@@ -178,7 +172,6 @@ fn save_creds(c: &Creds) -> Result<()> {
     let json = serde_json::to_vec(c)?;
     std::fs::write(data_dir().join("creds.json"), json)?;
     Ok(())
->>>>>>> dev
 }
 
 fn parse_fr(s: &str) -> Option<f32> {
@@ -268,22 +261,7 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
     Ok(semaines)
 }
 
-<<<<<<< HEAD
-fn load_store() -> Arc<CookieStoreRwLock> {
-    let store = std::fs::read(cookies_path())
-        .ok()
-        .and_then(|bytes| {
-            let mut rdr = std::io::Cursor::new(bytes);
-            cookie_store::CookieStore::load_json(&mut rdr).ok()
-        })
-        .unwrap_or_else(cookie_store::CookieStore::default);
-    Arc::new(CookieStoreRwLock::new(store))
-}
-
-async fn get_notes(store: Arc<CookieStoreRwLock>, username: &str, password: &str) -> Result<Vec<Semaine>> {
-=======
 async fn get_notes(username: &str, password: &str) -> Result<Vec<Semaine>> {
->>>>>>> dev
     let mut roots = RootCertStore::empty();
     roots.extend(TLS_SERVER_ROOTS.iter().cloned());
 
@@ -323,13 +301,6 @@ async fn get_notes(username: &str, password: &str) -> Result<Vec<Semaine>> {
         anyhow::bail!("Échec de connexion");
     }
 
-<<<<<<< HEAD
-    let mut wtr = std::io::Cursor::new(Vec::new());
-    store.read().unwrap().save_json(&mut wtr).map_err(|e| anyhow::anyhow!("sauvegarde des cookies : {e}"))?;
-    std::fs::write(cookies_path(), wtr.into_inner())?;
-
-=======
->>>>>>> dev
     let notes_page = client
         .get(format!("{BASE}/colles/mes_notes"))
         .send()

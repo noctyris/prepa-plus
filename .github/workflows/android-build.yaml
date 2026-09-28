@@ -65,6 +65,20 @@ jobs:
           cd "$GRADLE_DIR"
           ./gradlew assembleRelease
 
+      - name: Decode keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+
+      - name: Sign APK
+        run: |
+          SDK=/usr/local/lib/android/sdk
+          $SDK/build-tools/34.0.0/zipalign -f 4 \
+            target/dx/**/app/build/outputs/apk/release/app-release-unsigned.apk app-release-aligned.apk
+          $SDK/build-tools/34.0.0/apksigner sign \
+            --ks release.keystore --ks-pass pass:${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
+            --ks-key-alias ${{ secrets.ANDROID_KEY_ALIAS }} \
+            --out app-release-signed.apk app-release-aligned.apk
+
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

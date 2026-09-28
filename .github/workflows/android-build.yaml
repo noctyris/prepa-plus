@@ -52,6 +52,7 @@ jobs:
       - name: Inject launcher icons
         run: |
           RES=$(find target/dx -type d -path '*app/src/main/res' | head -1)
+          find "$RES" -name 'ic_launcher*.webp' -type f -delete
           for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
             d=${pair%%:*}; px=${pair##*:}
             convert icons/icon.png -resize ${px}x${px} "$RES/mipmap-${d}/ic_launcher.png"

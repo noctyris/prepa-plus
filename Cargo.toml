@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0.104"
 dioxus = { version = "0.7.10", features = ["desktop", "router"] }
 image-rs = { version = "0.1.2", features = ["dio"] }
+ndk-context = "0.1.1"
 regex = "1.13.1"
 reqwest = { version = "0.13", features = ["rustls", "cookies", "form", "charset", "http2", "system-proxy"], default-features = false }
 rustls = "0.23"

@@ -138,7 +138,9 @@ fn cookies_path() -> std::path::PathBuf {
 
     let file = env
         .call_method(&activity, "getFilesDir", "()Ljava/io/File;", &[])
-        .expect("getFilesDir");
+        .expect("getFilesDir")
+        .l()
+        .expect("JObject");
     let path = env
         .call_method(&file, "getAbsolutePath", "()Ljava/lang/String;", &[])
         .expect("getAbsolutePath")

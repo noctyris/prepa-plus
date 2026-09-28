@@ -3694,6 +3694,7 @@ dependencies = [
  "anyhow",
  "dioxus",
  "image-rs",
+ "ndk-context",
  "regex",
  "reqwest",
  "rustls",

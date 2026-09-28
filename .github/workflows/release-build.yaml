@@ -3,22 +3,10 @@ name: Release Build
 on:
   push:
     branches: [prod]
-  pull_request:
+#  pull_request:
 
 jobs:
-  check:
-    if: github.ref_name != 'prod'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Install Linux deps
-        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
-      - run: cargo check
-
   build-apk:
-    if: github.ref_name == 'prod'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

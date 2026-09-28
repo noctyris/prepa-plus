@@ -45,7 +45,7 @@ fn app() -> Element {
 
     rsx! {
         div { class: "container",
-            img { src: asset!("assets/icon.png"), class: "logo" }
+            img { src: asset!("icons/128x128.png"), class: "logo" }
             h1 { 
                 "Prépa+"
             }

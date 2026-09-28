@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0.104"
 cookie_store = "0.22.1"
 dioxus = { version = "0.7.10", features = ["desktop", "router"] }
+dirs = "7.0.0"
 dotenv = "0.15.0"
 image-rs = { version = "0.1.2", features = ["dio"] }
 regex = "1.13.1"

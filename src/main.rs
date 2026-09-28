@@ -4,10 +4,10 @@ use anyhow::{Context, Result};
 use scraper::{Html, Selector};
 use rustls::RootCertStore;
 use dioxus::prelude::*;
+use std::path::PathBuf;
 use serde::Serialize;
 use std::sync::Arc;
 
-const COOKIES_PATH: &str = "cookies.json";
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
 const LOGIN_URL: &str = "https://cpgedupuydelome.prepas-plus.fr/account/login/";
 
@@ -105,6 +105,12 @@ fn app() -> Element {
     }
 }
 
+fn cookies_path() -> PathBuf {
+    dirs::data_local_dir()
+        .unwrap_or_else(std::env::temp_dir)
+        .join("cookies.json")
+}
+
 fn parse_fr(s: &str) -> Option<f32> {
     s.trim().replace(',', ".").parse().ok()
 }
@@ -193,7 +199,7 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
 }
 
 fn load_store() -> Arc<CookieStoreRwLock> {
-    let store = std::fs::read(COOKIES_PATH)
+    let store = std::fs::read(cookies_path())
         .ok()
         .and_then(|bytes| {
             let mut rdr = std::io::Cursor::new(bytes);
@@ -245,7 +251,7 @@ async fn get_notes(store: Arc<CookieStoreRwLock>, username: &str, password: &str
 
     let mut wtr = std::io::Cursor::new(Vec::new());
     store.read().unwrap().save_json(&mut wtr).map_err(|e| anyhow::anyhow!("sauvegarde des cookies : {e}"))?;
-    std::fs::write(COOKIES_PATH, wtr.into_inner())?;
+    std::fs::write(cookies_path(), wtr.into_inner())?;
 
     let notes_page = client
         .get(format!("{BASE}/colles/mes_notes"))

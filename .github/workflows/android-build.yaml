@@ -71,13 +71,13 @@ jobs:
       - name: Sign APK
         run: |
           SDK=/usr/local/lib/android/sdk
-          $SDK/build-tools/34.0.0/zipalign -f 4 \
-            target/dx/**/app/build/outputs/apk/release/app-release-unsigned.apk app-release-aligned.apk
+          APK=$(find target/dx -name 'app-release-unsigned.apk' | head -1)
+          echo "APK trouvé : $APK"
+          $SDK/build-tools/34.0.0/zipalign -f 4 "$APK" app-release-aligned.apk
           $SDK/build-tools/34.0.0/apksigner sign \
             --ks release.keystore --ks-pass pass:${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
             --ks-key-alias ${{ secrets.ANDROID_KEY_ALIAS }} \
             --out app-release-signed.apk app-release-aligned.apk
-
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

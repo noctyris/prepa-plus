@@ -86,9 +86,4 @@ jobs:
           path: |
             target/dx/**/apk/**/*.apk
             target/dx/**/app/build/outputs/apk/**/*.apk
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: prepa-plus-apk
-          path: app-release-signed.apk
+            app-release-signed.apk

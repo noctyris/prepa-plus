@@ -2,3 +2,4 @@
 .env
 release.keystore
 cookies.json
+creds.json

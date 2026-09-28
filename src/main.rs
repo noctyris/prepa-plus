@@ -1,15 +1,21 @@
 use reqwest_cookie_store::CookieStoreRwLock;
+use serde::{Deserialize, Serialize};
 use webpki_roots::TLS_SERVER_ROOTS;
 use anyhow::{Context, Result};
 use scraper::{Html, Selector};
 use rustls::RootCertStore;
 use dioxus::prelude::*;
-use serde::Serialize;
 use std::sync::Arc;
 
 const COOKIES_PATH: &str = "cookies.json";
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
 const LOGIN_URL: &str = "https://cpgedupuydelome.prepas-plus.fr/account/login/";
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct Creds {
+    username: String,
+    password: String,
+}
 
 #[derive(Debug, Serialize, Clone)]
 struct Semaine {
@@ -41,17 +47,26 @@ fn main() {
 
 fn app() -> Element {
     let store = use_signal(load_store);
-    let mut username = use_signal(|| "HJAMIER".to_string());
+    let mut username = use_signal(String::new);
     let mut password = use_signal(String::new);
     let mut semaines = use_signal(|| None::<Vec<Semaine>>);
     let mut error = use_signal(|| None::<String>);
     let mut loading = use_signal(|| false);
 
-    let mut data = use_resource(async move || {
-        let store = load_store();
-        match get_notes(store.clone(), "", "").await {
-            Ok(semaines) => Some(semaines),
-            Err(_) => None,   // pas de cookies ou session expirée → affichera le login
+    let data = use_resource(move || {
+        let store = store.read().clone();
+        let creds = load_creds();
+        async move {
+            match creds {
+                Some(c) => get_notes(store, &c.username, &c.password).await.ok(),
+                None => None,
+            }
+        }
+    });
+
+    use_effect(move || {
+        if let Some(Some(s)) = data() {
+            semaines.set(Some(s));
         }
     });
 
@@ -61,29 +76,37 @@ fn app() -> Element {
             h1 { 
                 "Prépa+"
             }
-            input {
-                value: "{username}",
-                oninput: move |e| username.set(e.value()),
-                placeholder: "Identifiant",
-            }
-            input {
-                r#type: "password",
-                value: "{password}",
-                oninput: move |e| password.set(e.value()),
-                placeholder: "Mot de passe",
-            }
-            button {
-                disabled: loading(),
-                onclick: move |_| async move {
-                    loading.set(true);
-                    error.set(None);
-                    match get_notes(store.read().clone(), &username.read(), &password.read()).await {
-                        Ok(s) => semaines.set(Some(s)),
-                        Err(e) => error.set(Some(e.to_string())),
-                    }
-                    loading.set(false);
-                },
-                if loading() { "Chargement..." } else { "Voir mes notes" }
+            if semaines().is_none() {
+                input {
+                    value: "{username}",
+                    oninput: move |e| username.set(e.value()),
+                    placeholder: "Identifiant",
+                }
+                input {
+                    r#type: "password",
+                    value: "{password}",
+                    oninput: move |e| password.set(e.value()),
+                    placeholder: "Mot de passe",
+                }
+                button {
+                    disabled: loading(),
+                    onclick: move |_| async move {
+                        loading.set(true);
+                        error.set(None);
+                        match get_notes(store.read().clone(), &username.read(), &password.read()).await {
+                            Ok(s) => {
+                                semaines.set(Some(s));
+                                let _ = save_creds(&Creds {
+                                    username: username.read().clone(),
+                                    password: password.read().clone(),
+                                });
+                            },
+                            Err(e) => error.set(Some(e.to_string())),
+                        }
+                        loading.set(false);
+                    },
+                    if loading() { "Chargement..." } else { "Voir mes notes" }
+                }
             }
             if let Some(err) = error() {
                 p { class: "error", "{err}" }
@@ -103,6 +126,50 @@ fn app() -> Element {
             }
         }
     }
+}
+
+#[cfg(target_os = "android")]
+fn cookies_path() -> std::path::PathBuf {
+    use jni::objects::JObject;
+
+    let ctx = ndk_context::android_context();
+    let vm = unsafe { jni::JavaVM::from_raw(ctx.vm().cast()) }.expect("JavaVM");
+    let mut env = vm.attach_current_thread().expect("JNIEnv");
+    let activity = unsafe { JObject::from_raw(ctx.context().cast()) };
+
+    let file = env
+        .call_method(&activity, "getFilesDir", "()Ljava/io/File;", &[])
+        .expect("getFilesDir");
+    let path = env
+        .call_method(&file, "getAbsolutePath", "()Ljava/lang/String;", &[])
+        .expect("getAbsolutePath")
+        .l()
+        .expect("JString");
+    let s = env.get_string((&path).into()).expect("str");
+    let mut p = std::path::PathBuf::from(s.to_string_lossy().to_string());
+    p.push("cookies.json");
+    p
+}
+
+#[cfg(not(target_os = "android"))]
+fn cookies_path() -> std::path::PathBuf {
+    std::path::PathBuf::from(COOKIES_PATH)
+}
+
+fn data_dir() -> std::path::PathBuf {
+    cookies_path().parent().unwrap().to_path_buf()
+}
+
+fn load_creds() -> Option<Creds> {
+    let bytes = std::fs::read(data_dir().join("creds.json")).ok()?;
+    serde_json::from_slice(&bytes).ok()
+}
+
+fn save_creds(c: &Creds) -> Result<()> {
+    std::fs::create_dir_all(data_dir())?;
+    let json = serde_json::to_vec(c)?;
+    std::fs::write(data_dir().join("creds.json"), json)?;
+    Ok(())
 }
 
 fn parse_fr(s: &str) -> Option<f32> {
@@ -193,7 +260,7 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
 }
 
 fn load_store() -> Arc<CookieStoreRwLock> {
-    let store = std::fs::read(COOKIES_PATH)
+    let store = std::fs::read(cookies_path())
         .ok()
         .and_then(|bytes| {
             let mut rdr = std::io::Cursor::new(bytes);
@@ -245,7 +312,7 @@ async fn get_notes(store: Arc<CookieStoreRwLock>, username: &str, password: &str
 
     let mut wtr = std::io::Cursor::new(Vec::new());
     store.read().unwrap().save_json(&mut wtr).map_err(|e| anyhow::anyhow!("sauvegarde des cookies : {e}"))?;
-    std::fs::write(COOKIES_PATH, wtr.into_inner())?;
+    std::fs::write(cookies_path(), wtr.into_inner())?;
 
     let notes_page = client
         .get(format!("{BASE}/colles/mes_notes"))

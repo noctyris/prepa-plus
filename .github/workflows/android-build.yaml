@@ -60,7 +60,8 @@ jobs:
 
       - name: Rebuild APK with icons
         run: |
-          cd target/dx/prepa-plus/release/android/app/app
+          GRADLE_DIR=$(dirname "$(find target/dx -name gradlew | head -1)")
+          cd "$GRADLE_DIR"
           ./gradlew assembleRelease
 
       - name: Upload APK

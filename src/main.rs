@@ -5,7 +5,6 @@ use scraper::{Html, Selector};
 use rustls::RootCertStore;
 use dioxus::prelude::*;
 
-const COOKIES_PATH: &str = "cookies.json";
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
 const LOGIN_URL: &str = "https://cpgedupuydelome.prepas-plus.fr/account/login/";
 

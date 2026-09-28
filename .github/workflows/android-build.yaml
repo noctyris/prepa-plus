@@ -36,6 +36,9 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.0.12077973" "platforms;android-34" "build-tools;34.0.0"
 
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
       - name: Install Dioxus CLI
         run: cargo install dioxus-cli --locked
 
@@ -46,9 +49,24 @@ jobs:
           ANDROID_HOME: /usr/local/lib/android/sdk
           ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
+      - name: Inject launcher icons
+        run: |
+          RES=$(find target/dx -type d -path '*app/src/main/res' | head -1)
+          for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${pair%%:*}; px=${pair##*:}
+            magick icons/icon.png -resize ${px}x${px} "$RES/mipmap-${d}/ic_launcher.png"
+          done
+          rm -f "$RES/mipmap-anydpi-v26/ic_launcher.xml"
+
+      - name: Rebuild APK with icons
+        run: |
+          cd target/dx/prepa-plus/release/android/app/app
+          ./gradlew assembleRelease
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: prepa-plus-apk
           path: |
             target/dx/**/apk/**/*.apk
+            target/dx/**/app/build/outputs/apk/**/*.apk

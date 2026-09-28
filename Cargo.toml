@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.104"
 dioxus = { version = "0.7.10", features = ["desktop", "router"] }
+dirs = "7.0.0"
 image-rs = { version = "0.1.2", features = ["dio"] }
 ndk-context = "0.1.1"
 regex = "1.13.1"

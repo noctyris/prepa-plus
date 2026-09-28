@@ -153,7 +153,9 @@ fn cookies_path() -> std::path::PathBuf {
 
 #[cfg(not(target_os = "android"))]
 fn cookies_path() -> std::path::PathBuf {
-    std::path::PathBuf::from(COOKIES_PATH)
+    let mut p = dirs::data_local_dir().unwrap_or_else(|| std::path::PathBuf::from("."));
+    p.push("prepa-plus");
+    p
 }
 
 fn data_dir() -> std::path::PathBuf {

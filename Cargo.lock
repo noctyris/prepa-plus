@@ -1342,12 +1342,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
-
-[[package]]
 name = "dpi"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3698,13 +3692,10 @@ name = "prepa-plus"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "cookie_store",
  "dioxus",
- "dotenv",
  "image-rs",
  "regex",
  "reqwest",
- "reqwest_cookie_store",
  "rustls",
  "scraper",
  "serde",
@@ -4271,18 +4262,6 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
-]
-
-[[package]]
-name = "reqwest_cookie_store"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beb98c4d52ae6ceed18a0dff0564717623dd75fae08619ae0927332f0a81abbc"
-dependencies = [
- "bytes",
- "cookie_store",
- "reqwest",
- "url",
 ]
 
 [[package]]

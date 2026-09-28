@@ -1,11 +1,9 @@
-use reqwest_cookie_store::CookieStoreRwLock;
 use serde::{Deserialize, Serialize};
 use webpki_roots::TLS_SERVER_ROOTS;
 use anyhow::{Context, Result};
 use scraper::{Html, Selector};
 use rustls::RootCertStore;
 use dioxus::prelude::*;
-use std::sync::Arc;
 
 const COOKIES_PATH: &str = "cookies.json";
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
@@ -46,7 +44,6 @@ fn main() {
 }
 
 fn app() -> Element {
-    let store = use_signal(load_store);
     let mut username = use_signal(String::new);
     let mut password = use_signal(String::new);
     let mut semaines = use_signal(|| None::<Vec<Semaine>>);
@@ -54,11 +51,10 @@ fn app() -> Element {
     let mut loading = use_signal(|| false);
 
     let data = use_resource(move || {
-        let store = store.read().clone();
         let creds = load_creds();
         async move {
             match creds {
-                Some(c) => get_notes(store, &c.username, &c.password).await.ok(),
+                Some(c) => get_notes(&c.username, &c.password).await.ok(),
                 None => None,
             }
         }
@@ -93,7 +89,7 @@ fn app() -> Element {
                     onclick: move |_| async move {
                         loading.set(true);
                         error.set(None);
-                        match get_notes(store.read().clone(), &username.read(), &password.read()).await {
+                        match get_notes(&username.read(), &password.read()).await {
                             Ok(s) => {
                                 semaines.set(Some(s));
                                 let _ = save_creds(&Creds {
@@ -106,6 +102,9 @@ fn app() -> Element {
                         loading.set(false);
                     },
                     if loading() { "Chargement..." } else { "Voir mes notes" }
+                }
+                if let Some(e) = error() {
+                    p { class: "error", "{e}" }
                 }
             }
             if let Some(err) = error() {
@@ -147,7 +146,6 @@ fn cookies_path() -> std::path::PathBuf {
         .expect("JString");
     let s = env.get_string((&path).into()).expect("str");
     let mut p = std::path::PathBuf::from(s.to_string_lossy().to_string());
-    p.push("cookies.json");
     p
 }
 
@@ -259,18 +257,7 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
     Ok(semaines)
 }
 
-fn load_store() -> Arc<CookieStoreRwLock> {
-    let store = std::fs::read(cookies_path())
-        .ok()
-        .and_then(|bytes| {
-            let mut rdr = std::io::Cursor::new(bytes);
-            cookie_store::CookieStore::load_json(&mut rdr).ok()
-        })
-        .unwrap_or_else(cookie_store::CookieStore::default);
-    Arc::new(CookieStoreRwLock::new(store))
-}
-
-async fn get_notes(store: Arc<CookieStoreRwLock>, username: &str, password: &str) -> Result<Vec<Semaine>> {
+async fn get_notes(username: &str, password: &str) -> Result<Vec<Semaine>> {
     let mut roots = RootCertStore::empty();
     roots.extend(TLS_SERVER_ROOTS.iter().cloned());
 
@@ -279,7 +266,7 @@ async fn get_notes(store: Arc<CookieStoreRwLock>, username: &str, password: &str
         .with_no_client_auth();
 
     let client = reqwest::Client::builder()
-        .cookie_provider(store.clone())
+        .cookie_store(true)
         .tls_backend_preconfigured(tls)
         .build()?;
 
@@ -309,10 +296,6 @@ async fn get_notes(store: Arc<CookieStoreRwLock>, username: &str, password: &str
     if r.url().as_str().contains("account/login") {
         anyhow::bail!("Échec de connexion");
     }
-
-    let mut wtr = std::io::Cursor::new(Vec::new());
-    store.read().unwrap().save_json(&mut wtr).map_err(|e| anyhow::anyhow!("sauvegarde des cookies : {e}"))?;
-    std::fs::write(cookies_path(), wtr.into_inner())?;
 
     let notes_page = client
         .get(format!("{BASE}/colles/mes_notes"))

@@ -83,7 +83,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: prepa-plus-apk
-          path: |
-            target/dx/**/apk/**/*.apk
-            target/dx/**/app/build/outputs/apk/**/*.apk
-            app-release-signed.apk
+          path: app-release-signed.apk

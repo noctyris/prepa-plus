@@ -72,9 +72,6 @@ fn app() -> Element {
                     p { class: "error", "{e}" }
                 }
             }
-            if let Some(err) = error() {
-                p { class: "error", "{err}" }
-            }
             if let Some(semaines) = semaines() {
                 for sem in semaines {
                     div { class: "card",

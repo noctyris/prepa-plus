@@ -34,7 +34,6 @@ fn cookies_path() -> std::path::PathBuf {
         .l()
         .expect("JString");
     let s = env.get_string((&path).into()).expect("str");
-//    let mut p = std::path::PathBuf::from(s.to_string_lossy().to_string());
     let p = std::path::PathBuf::from(s.to_string_lossy().to_string());
     p
 }

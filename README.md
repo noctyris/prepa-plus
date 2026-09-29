@@ -1,4 +1,4 @@
-> 🇫🇷 Version française
+> 🇫🇷 [Version française](https://github.com/noctyris/prepa-plus/blob/dev/README.fr.md)
 
 # Prépa+
 

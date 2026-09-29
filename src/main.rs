@@ -5,6 +5,8 @@ use scraper::{Html, Selector};
 use rustls::RootCertStore;
 use dioxus::prelude::*;
 
+mod parse;
+
 const BASE: &str = "https://cpgedupuydelome.prepas-plus.fr";
 const LOGIN_URL: &str = "https://cpgedupuydelome.prepas-plus.fr/account/login/";
 
@@ -174,10 +176,6 @@ fn save_creds(c: &Creds) -> Result<()> {
     Ok(())
 }
 
-fn parse_fr(s: &str) -> Option<f32> {
-    s.trim().replace(',', ".").parse().ok()
-}
-
 fn parse_semaine(s: &str) -> (Option<u8>, String, String) {
     let (tag, dates) = match s.split_once(':') {
         Some((t, d)) => (t.trim().trim_start_matches('S').to_string(), d.trim()),
@@ -203,9 +201,9 @@ fn parse_detail(d: &str) -> (String, Rang, Option<f32>, Option<f32>) {
             rang.rang = it.next().and_then(|s| s.trim().parse().ok());
             rang.total = it.next().and_then(|s| s.trim().parse().ok());
         } else if let Some(v) = part.strip_prefix("Moy:") {
-            moyenne = parse_fr(v);
+            moyenne = parse::parse_fr(v);
         } else if let Some(v) = part.strip_prefix("ET:") {
-            et = parse_fr(v);
+            et = parse::parse_fr(v);
         } else if !part.is_empty() {
             prof = part.to_string();
         }
@@ -248,7 +246,7 @@ fn parse_notes(html: &str) -> Result<Vec<Semaine>> {
 
                 notes.push(Note {
                     matiere: matiere.clone(),
-                    note: parse_fr(&note_txt),
+                    note: parse::parse_fr(&note_txt),
                     professeur,
                     rang,
                     moyenne,

@@ -32,20 +32,20 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "csslib",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/csslib-1.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
       "name": "cupertino_icons",
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.9",
       "packageUri": "lib/",
       "languageVersion": "3.9"
     },
     {
-      "name": "cupertino_ui",
-      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/cupertino_ui-1.1.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.13"
-    },
-    {
       "name": "dynamic_color",
-      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/dynamic_color-2.1.0",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/dynamic_color-1.7.0",
       "packageUri": "lib/",
       "languageVersion": "2.16"
     },
@@ -54,6 +54,18 @@
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/fake_async-1.3.3",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "ffi",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/ffi-2.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "file",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/file-7.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "flutter",
@@ -68,22 +80,34 @@
       "languageVersion": "3.8"
     },
     {
-      "name": "flutter_localizations",
-      "rootUri": "file:///home/noctyris/.local/opt/flutter/packages/flutter_localizations",
-      "packageUri": "lib/",
-      "languageVersion": "3.11"
-    },
-    {
       "name": "flutter_test",
       "rootUri": "file:///home/noctyris/.local/opt/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.11"
     },
     {
-      "name": "intl",
-      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/intl-0.20.3",
+      "name": "flutter_web_plugins",
+      "rootUri": "file:///home/noctyris/.local/opt/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.11"
+    },
+    {
+      "name": "html",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/html-0.15.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "http",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/http-1.6.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "http_parser",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/http_parser-4.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "leak_tracker",
@@ -122,12 +146,6 @@
       "languageVersion": "3.5"
     },
     {
-      "name": "material_ui",
-      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/material_ui-1.5.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.13"
-    },
-    {
       "name": "meta",
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/meta-1.18.3",
       "packageUri": "lib/",
@@ -138,6 +156,78 @@
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/path-1.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "path_provider_linux",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "path_provider_platform_interface",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/path_provider_platform_interface-2.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "path_provider_windows",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "platform",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/platform-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "plugin_platform_interface",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "shared_preferences",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "shared_preferences_android",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.28",
+      "packageUri": "lib/",
+      "languageVersion": "3.12"
+    },
+    {
+      "name": "shared_preferences_foundation",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "shared_preferences_linux",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "shared_preferences_platform_interface",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences_platform_interface-2.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "shared_preferences_web",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "shared_preferences_windows",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "sky_engine",
@@ -182,6 +272,12 @@
       "languageVersion": "3.10"
     },
     {
+      "name": "typed_data",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "vector_math",
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/vector_math-2.4.0",
       "packageUri": "lib/",
@@ -192,6 +288,18 @@
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/vm_service-15.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "web",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/web-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "xdg_directories",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/xdg_directories-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "prepahub",

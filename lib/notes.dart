@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'api/parse.dart';
-import 'main.dart';
+//import 'main.dart';
 
 class NotesPage extends StatelessWidget {
   final List<Semaine> semaines;

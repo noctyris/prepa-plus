@@ -38,6 +38,18 @@
       "languageVersion": "3.9"
     },
     {
+      "name": "cupertino_ui",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/cupertino_ui-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.13"
+    },
+    {
+      "name": "dynamic_color",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/dynamic_color-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
+    },
+    {
       "name": "fake_async",
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/fake_async-1.3.3",
       "packageUri": "lib/",
@@ -56,10 +68,22 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "flutter_localizations",
+      "rootUri": "file:///home/noctyris/.local/opt/flutter/packages/flutter_localizations",
+      "packageUri": "lib/",
+      "languageVersion": "3.11"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///home/noctyris/.local/opt/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.11"
+    },
+    {
+      "name": "intl",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/intl-0.20.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "leak_tracker",
@@ -96,6 +120,12 @@
       "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/material_color_utilities-0.13.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "material_ui",
+      "rootUri": "file:///home/noctyris/.pub-cache/hosted/pub.dev/material_ui-1.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.13"
     },
     {
       "name": "meta",

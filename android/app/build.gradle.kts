@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "fr.circumpolar.prepahub"
-    compileSdk = flutter.compileSdkVersion
+//    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

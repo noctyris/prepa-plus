@@ -1,6 +1,24 @@
-.env
-release.keystore
-creds.json
-dart_tool
-build
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock    # (voir note ci-dessous)
+
+target/
+
+.idea/
 ide
+*.iml
+.vscode/
+
+release.keystore
+key.properties
+*.jks
+*.pem
+
+*.json
+!pubspec.json   # non, n'existe pas ; liste plutôt les tiens :
+!*.webmanifest

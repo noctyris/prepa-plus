@@ -1,5 +1,7 @@
 > 🇫🇷 [Version française](https://github.com/noctyris/prepa-plus/blob/dev/README.fr.md)
 
+<span style="color: red; font-weight: 900;">Whole repo will be switched to Flutter due to Material You support</span>
+
 # Prépa+
 
 A mobile and desktop app for checking your PRÉPA+ grades straight from your phone, no browser needed.

@@ -1,5 +1,6 @@
-/target
 .env
 release.keystore
-cookies.json
 creds.json
+dart_tool
+build
+ide

@@ -18,6 +18,7 @@ release.keystore
 key.properties
 *.jks
 *.pem
+.env*
 
 *.json
 !pubspec.json   # non, n'existe pas ; liste plutôt les tiens :

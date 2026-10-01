@@ -25,9 +25,8 @@ tasks.register<Delete>("clean") {
 
 subprojects {
     afterEvaluate {
-        extensions.findByType(com.android.build.gradle.BaseExtension::class.java)?.let { android ->
-            if ((android.compileSdkVersion ?: 0) < 35) {
-                android.compileSdkVersion = 35
+            extensions.findByType(com.android.build.api.dsl.CommonExtension::class.java)?.let { android -> 
+                android.compileSdk = 35
             }
         }
     }

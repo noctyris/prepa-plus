@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'api/client.dart';
 import 'api/parse.dart';
@@ -7,27 +8,33 @@ import 'login.dart';
 import 'notes.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(const PrepaHubApp());
 }
 
 class PrepaHubApp extends StatelessWidget {
   const PrepaHubApp({super.key});
 
+  static const _seed = Color(0xFF3F51B5);
+
   @override
   Widget build(BuildContext context) {
+    // Material You : couleurs du fond d'écran (Android 12+), sinon palette
+    // générée depuis une couleur de départ.
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
-        ColorScheme? light = lightDynamic;
-        ColorScheme? dark = darkDynamic;
-        light ??= ColorScheme.fromSeed(seedColor: const Color(0xFF3F51B5));
-        dark ??= ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3F51B5),
-          brightness: Brightness.dark,
-        );
+        final light = lightDynamic?.harmonized() ??
+            ColorScheme.fromSeed(seedColor: _seed);
+        final dark = darkDynamic?.harmonized() ??
+            ColorScheme.fromSeed(
+                seedColor: _seed, brightness: Brightness.dark);
         return MaterialApp(
           title: 'PrepaHub',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(colorScheme: light, useMaterial3: true),
           darkTheme: ThemeData(colorScheme: dark, useMaterial3: true),
+          themeMode: ThemeMode.system,
           home: const RootPage(),
         );
       },
@@ -45,6 +52,7 @@ class RootPage extends StatefulWidget {
 class _RootPageState extends State<RootPage> {
   bool loading = true;
   List<Semaine>? semaines;
+  String? error; // erreur réseau avec identifiants conservés
 
   @override
   void initState() {
@@ -53,6 +61,10 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _autoLogin() async {
+    setState(() {
+      loading = true;
+      error = null;
+    });
     final creds = await loadCreds();
     if (!mounted) return;
     if (creds == null) {
@@ -62,12 +74,50 @@ class _RootPageState extends State<RootPage> {
     try {
       final s = await getNotes(creds.username, creds.password);
       if (!mounted) return;
-      setState(() => semaines = s);
-    } catch (_) {
+      setState(() {
+        semaines = s;
+        loading = false;
+      });
+    } on AuthException {
+      // Seuls des identifiants réellement refusés sont effacés.
       await clearCreds();
       if (!mounted) return;
       setState(() => loading = false);
+    } on NetworkException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        error = e.message;
+        loading = false;
+      });
     }
+  }
+
+  Future<void> _refresh() async {
+    final creds = await loadCreds();
+    if (creds == null) {
+      await _logout();
+      return;
+    }
+    try {
+      final s = await getNotes(creds.username, creds.password);
+      if (mounted) setState(() => semaines = s);
+    } on AuthException {
+      await _logout();
+    } on NetworkException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  Future<void> _logout() async {
+    await clearCreds();
+    if (!mounted) return;
+    setState(() {
+      semaines = null;
+      error = null;
+      loading = false;
+    });
   }
 
   @override
@@ -75,9 +125,62 @@ class _RootPageState extends State<RootPage> {
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (semaines == null) {
-      return LoginPage(onSuccess: (s) => setState(() => semaines = s));
+    if (semaines != null) {
+      return NotesPage(
+        semaines: semaines!,
+        onRefresh: _refresh,
+        onLogout: _logout,
+      );
     }
-    return NotesPage(semaines: semaines!);
+    if (error != null) {
+      return _ErrorView(message: error!, onRetry: _autoLogin, onLogout: _logout);
+    }
+    return LoginPage(onSuccess: (s) => setState(() => semaines = s));
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  final VoidCallback onLogout;
+  const _ErrorView(
+      {required this.message, required this.onRetry, required this.onLogout});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.cloud_off_rounded, size: 64, color: cs.primary),
+                const SizedBox(height: 16),
+                Text('Connexion impossible',
+                    style: Theme.of(context).textTheme.headlineSmall),
+                const SizedBox(height: 8),
+                Text(message,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: cs.onSurfaceVariant)),
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Réessayer'),
+                ),
+                TextButton(
+                    onPressed: onLogout, child: const Text('Changer de compte')),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

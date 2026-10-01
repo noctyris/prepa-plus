@@ -6,42 +6,31 @@ on:
   pull_request:
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Install Linux deps
-        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
-      - run: cargo check
-
   build-apk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: subosito/flutter-action@v2
         with:
-          targets: aarch64-linux-android
-      - uses: Swatinem/rust-cache@v2
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Accept licenses & install NDK
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.0.12077973" "platforms;android-34" "build-tools;34.0.0"
-      - name: Install Dioxus CLI
-        run: cargo install dioxus-cli --locked
-      - name: Build APK
-        run: dx build --platform android --target aarch64-linux-android   # PAS de --release
-        env:
-          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/27.0.12077973
+          channel: stable
+          cache: true
+      - name: Flutter doctor (infos build)
+        run: flutter doctor -v
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Build APK (debug)
+        run: flutter build apk --debug
+
+      - name: Prepare artifact
+        run: cp build/app/outputs/flutter-apk/app-debug.apk prepahub-dev.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: prepa-plus-dev-apk
-          path: target/dx/**/apk/**/*.apk
+          name: prepahub-dev-apk
+          path: prepahub-dev.apk

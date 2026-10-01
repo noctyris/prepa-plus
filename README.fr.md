@@ -1,59 +1,65 @@
-# Prépa+
+# PrépaHub
 
-Application mobile et desktop pour consulter ses notes PRÉPA+ directement sur son téléphone, sans passer par le navigateur.
+> 🇬🇧 [English version](README.md)
 
-Fait avec [Dioxus](https://dioxuslabs.com) (Rust).
+Une appli mobile et desktop pour consulter tes notes PRÉPA+ directement depuis ton téléphone, sans passer par un navigateur.
+
+Réalisée avec [Flutter](https://flutter.dev) (Dart), avec support Material You (Material 3) — couleurs dynamiques comprises.
 
 ## Fonctionnalités
 
-- Connexion à un compte PRÉPA+ depuis l'application
-- Affichage des notes par semaine (matière, note, professeur, rang, moyenne, écart type)
-- Session persistante : l'application se reconnecte automatiquement au lancement (identifiants stockés localement sur l'appareil)
-- Disponible sur Android et desktop (Linux)
+* Connexion à un compte PRÉPA+ depuis l'application
+* Notes affichées semaine par semaine (matière, note, professeur, classement, moyenne, écart-type)
+* Session persistante : l'application se reconnecte automatiquement au lancement (identifiants stockés localement sur l'appareil)
+* Material You : s'adapte à la palette de ton système sur Android 12+
+* Disponible sur Android et desktop (Linux)
 
 ## Feuille de route
 
-- [ ] Connexion à Pronote
-- [ ] Style Material UI
-- [ ] Widgets sur l'écran d'accueil
-- [ ] Notifications quand une nouvelle note est publiée
-- [ ] Gestion des erreurs (identifiants invalides, réseau indisponible, spinners…)
-- [ ] Builds pour plusieurs architectures de téléphone
-- [ ] Sauvegarde locale des notes en cas de problème de connexion
-- [ ] Saisie manuelle des notes hors ligne, avec déduplication quand la note apparaît en ligne
-- [ ] Planning des colles sauvegardé localement
-- [x] Conservation des identifiants entre les lancements
+* [ ] Intégration Pronote
+* [ ] Widgets sur l'écran d'accueil
+* [ ] Notifications à la publication d'une nouvelle note
+* [ ] Gestion des erreurs (identifiants invalides, pas de réseau, spinners…)
+* [ ] Builds pour plusieurs architectures de téléphone
+* [ ] Cache hors-ligne des notes
+* [ ] Emploi du temps des colles hors-ligne
+* [x] Conserver les identifiants entre les lancements
+* [x] Couleurs dynamiques Material You
 
-## Construction
+## Compilation
 
 ### Prérequis
 
-- Rust (édition 2024)
-- Pour Android : SDK Android, NDK, et la cible `aarch64-linux-android`
+* [Flutter](https://docs.flutter.dev/get-started/install) (canal stable)
+* Pour Android : le SDK Android (Gradle télécharge ce qu'il faut)
 
-```bash
-rustup target add aarch64-linux-android
-cargo install dioxus-cli
+```shell
+flutter doctor
 ```
 
 ### Desktop
 
-```bash
-dx serve
+```shell
+flutter run -d linux
 ```
 
 ### Android (APK)
 
-```bash
-dx build --platform android --release --target aarch64-linux-android
+```shell
+flutter build apk --release
 ```
 
-L'APK est généré dans `target/dx/prepa-plus/release/android/app/build/outputs/apk/`.
+L'APK est généré dans `build/app/outputs/flutter-apk/`.
 
 ## Sécurité
 
-Les identifiants sont stockés dans le répertoire de données privé de l'application et ne sont jamais envoyés ailleurs qu'au serveur PRÉPA+.
+Les identifiants sont stockés dans le répertoire privé de l'application (SharedPreferences) et ne sont jamais envoyés ailleurs qu'au serveur PRÉPA+.
 
 ## Licence
 
 À définir.
+
+## À propos
+
+Application de consultation de notes, écrite en Flutter.
+

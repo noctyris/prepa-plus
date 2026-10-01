@@ -20,8 +20,6 @@ class PrepaHubApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Material You : couleurs du fond d'écran (Android 12+), sinon palette
-    // générée depuis une couleur de départ.
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         final light = lightDynamic?.harmonized() ??
@@ -52,7 +50,7 @@ class RootPage extends StatefulWidget {
 class _RootPageState extends State<RootPage> {
   bool loading = true;
   List<Semaine>? semaines;
-  String? error; // erreur réseau avec identifiants conservés
+  String? error;
 
   @override
   void initState() {
@@ -79,7 +77,6 @@ class _RootPageState extends State<RootPage> {
         loading = false;
       });
     } on AuthException {
-      // Seuls des identifiants réellement refusés sont effacés.
       await clearCreds();
       if (!mounted) return;
       setState(() => loading = false);

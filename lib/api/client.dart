@@ -10,7 +10,6 @@ const base = 'https://cpgedupuydelome.prepas-plus.fr';
 const loginUrl = '$base/account/login/';
 const notesUrl = '$base/colles/mes_notes';
 
-/// Identifiants refusés par le serveur (ou 2FA requise).
 class AuthException implements Exception {
   final String message;
   const AuthException(this.message);
@@ -18,7 +17,6 @@ class AuthException implements Exception {
   String toString() => message;
 }
 
-/// Problème réseau / serveur : les identifiants ne sont PAS en cause.
 class NetworkException implements Exception {
   final String message;
   const NetworkException(this.message);
@@ -52,9 +50,6 @@ Future<void> clearCreds() async {
   await prefs.remove('password');
 }
 
-/// Client HTTP avec jar de cookies et suivi manuel des redirections.
-/// (`package:http` ne garde aucun cookie : sans ça, ni le CSRF ni la
-/// session Django ne survivent d'une requête à l'autre.)
 class _Session {
   final http.Client _client = http.Client();
   final Map<String, String> _cookies = {};
@@ -105,8 +100,6 @@ class _Session {
   void _storeCookies(http.Response res) {
     final raw = res.headers['set-cookie'];
     if (raw == null) return;
-    // `http` fusionne les Set-Cookie avec ", " ; on ne coupe que devant un
-    // "nom=" pour ne pas casser les dates "Expires=Wed, 01 Jan ...".
     for (final c in raw.split(RegExp(r',(?=\s*[^;,=\s]+=)'))) {
       final parts = c.split(';');
       final kv = parts.first.trim();
@@ -157,7 +150,6 @@ Future<List<Semaine>> getNotes(String username, String password) async {
       throw const AuthException(
           "L'authentification à deux facteurs n'est pas prise en charge");
     }
-    // Échec = Django ré-affiche le formulaire (200, sans redirection).
     if (loginDoc.querySelector('input[name="auth-password"]') != null) {
       throw const AuthException('Identifiant ou mot de passe incorrect');
     }

@@ -5,7 +5,8 @@
 build/
 .flutter-plugins
 .flutter-plugins-dependencies
-pubspec.lock    # (voir note ci-dessous)
+pubspec.lock
+.dart_tool
 
 target/
 
@@ -21,5 +22,5 @@ key.properties
 .env*
 
 *.json
-!pubspec.json   # non, n'existe pas ; liste plutôt les tiens :
+!pubspec.json
 !*.webmanifest

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'api/parse.dart';
-
 class ColloscopePage extends StatelessWidget {
-    @override
-    Widget build(BuildContext context) {
-        return Scaffold(
-            body: <Widget>[
-                Text("Hi")
-            ][0]
-        );
-    }
+  const ColloscopePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: Text('Aucun colloscope pour le moment')),
+    );
+  }
 }

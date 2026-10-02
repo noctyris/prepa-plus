@@ -83,8 +83,8 @@ class _NavigationState extends State<Navigation> {
         /// Colloscope
         ColloscopePage(),
         
-        /// Messages page
-        Text("Rien")
+        /// Idk
+        const Center(child: Text('Rien pour le moment')),
         ][currentPageIndex],
     );
   }

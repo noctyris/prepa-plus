@@ -49,7 +49,7 @@ class NotesPage extends StatelessWidget {
                   itemCount: semaines.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, i) =>
-                      _SemaineCard(key: ValueKey(i), semaine: semaines[i], expanded: i == 0),
+                      _SemaineCard(key: ValueKey(i), semaine: semaines[i], expanded: i == semaines.length - 1),
                 ),
               ),
           ],

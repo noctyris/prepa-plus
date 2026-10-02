@@ -122,13 +122,13 @@ class _RootPageState extends State<RootPage> {
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
-    return AppViewPage(
-        semaines:   semaines!,
-        onRefresh:  _refresh,
-        onLogout:   _logout,
-    );
-    
+    if (semaines !=  null) {
+        return AppViewPage(
+            semaines:   semaines!,
+            onRefresh:  _refresh,
+            onLogout:   _logout,
+        );
+    }
     if (error != null) {
       return _ErrorView(message: error!, onRetry: _autoLogin, onLogout: _logout);
     }

@@ -18,12 +18,10 @@ class AppViewPage extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return MaterialApp(
-            home: Navigation(
-                semaines:   semaines,
-                onRefresh:  onRefresh,
-                onLogout:   onLogout
-            )
+        return Navigation(
+            semaines:   semaines,
+            onRefresh:  onRefresh,
+            onLogout:   onLogout
         );
     }
 }
@@ -56,7 +54,6 @@ class _NavigationState extends State<Navigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.amber,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(

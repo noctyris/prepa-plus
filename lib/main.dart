@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'api/client.dart';
 import 'api/parse.dart';
 import 'login.dart';
-import 'notes.dart';
+import "appview.dart";
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -122,13 +122,13 @@ class _RootPageState extends State<RootPage> {
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (semaines != null) {
-      return NotesPage(
-        semaines: semaines!,
-        onRefresh: _refresh,
-        onLogout: _logout,
-      );
-    }
+
+    return AppViewPage(
+        semaines:   semaines!,
+        onRefresh:  _refresh,
+        onLogout:   _logout,
+    );
+    
     if (error != null) {
       return _ErrorView(message: error!, onRetry: _autoLogin, onLogout: _logout);
     }

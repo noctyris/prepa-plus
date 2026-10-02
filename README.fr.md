@@ -1,5 +1,5 @@
 # PrépaHub
-
+[![Release Build](https://github.com/noctyris/prepahub/actions/workflows/release-build.yaml/badge.svg)](https://github.com/noctyris/prepahub/actions/workflows/release-build.yaml)
 > 🇬🇧 [English version](README.md)
 
 Une appli mobile et desktop pour consulter tes notes PRÉPA+ directement depuis ton téléphone, sans passer par un navigateur.

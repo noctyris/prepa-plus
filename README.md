@@ -1,5 +1,5 @@
 # PrépaHub
-
+[![Release Build](https://github.com/noctyris/prepahub/actions/workflows/release-build.yaml/badge.svg)](https://github.com/noctyris/prepahub/actions/workflows/release-build.yaml)
 > 🇫🇷 [Version française](README.fr.md)
 
 A mobile and desktop app for checking your PRÉPA+ grades straight from your phone, no browser needed.
